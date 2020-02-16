@@ -1,4 +1,4 @@
-"""切断時のLambdaプログラムです
+"""ニックネーム変更時のLambdaプログラムです
 """
 
 import json
@@ -105,7 +105,28 @@ def lambda_handler(event, context):
         endpoint_url='https://' + domain_name + '/' + stage_name)
     # 切断処理を行います
     dcm = DisconnectManager(table, api)
-    dcm.disconnect(conn_id)
-    return {
-        'statusCode': 200
-    }
+    conn_item_res = table.get_item(Key={
+        'Id': conn_id,
+        'Field': 'CMng'
+    })
+    try:
+        ebody = json.loads(event['body'])
+    except:
+        return {
+            'statusCode': 200
+        }
+    if 'nickname' not in ebody or ebody[
+        'nickname'] is None or ebody['nickname'] == '' or ebody[
+        'nickname'] == 'SYSTEM':
+        return {
+            'statusCode': 200
+        }
+    if 'Item' not in conn_item_res:
+        return {
+            'statusCode': 200
+        }
+    conn_item = conn_item_res['Item']
+    old_name = 'No name' if conn_item['Content'][
+        'Name'] is None else conn_item['Content']['Name']
+    conn_item['Content']['Name'] = ebody['nickname']
+    table.put_item(Item=conn_item)
