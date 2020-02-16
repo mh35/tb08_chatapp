@@ -88,6 +88,31 @@ class DisconnectManager:
         except:
             pass
 
+    def send_channel(self, channel_id, content):
+        """チャネルにメッセージを送信します
+        """
+        ch_conns_res = self.__table.query(
+            IndexName='GSI1',
+            KeyConditionExpression=Key('Field').eq(
+                channel_id)
+        )
+        for rec in ch_conns_res['Items']:
+            if rec['Id'] in self.__disconn_ids:
+                continue
+            scontent = content.copy()
+            scontent.update({'channel_name': channel_id[2:]})
+            self.send_message(rec['Id'], scontent)
+
+    def send_all_joining_channels(self, conn_id, content):
+        """所属しているすべてのチャネルにメッセージを送信します
+        """
+        ch_recs_res = self.__table.query(
+            KeyConditionExpression=Key('Id').eq(
+                conn_id) & Key('Field').begins_with('CH')
+        )
+        for rec in ch_recs_res['Items']:
+            self.send_channel(rec['Field'], content)
+
 def lambda_handler(event, context):
     """Lambdaハンドラのメインプログラムです
     """
@@ -130,3 +155,11 @@ def lambda_handler(event, context):
         'Name'] is None else conn_item['Content']['Name']
     conn_item['Content']['Name'] = ebody['nickname']
     table.put_item(Item=conn_item)
+    dcm.send_all_joining_channels({
+        'message': old_name + ' is now known as ' + ebody[
+            'nickname'],
+        'sender': 'SYSTEM'
+    })
+    return {
+        'statusCode': 200
+    }
