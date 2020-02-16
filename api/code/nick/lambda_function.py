@@ -155,7 +155,7 @@ def lambda_handler(event, context):
         'Name'] is None else conn_item['Content']['Name']
     conn_item['Content']['Name'] = ebody['nickname']
     table.put_item(Item=conn_item)
-    dcm.send_all_joining_channels({
+    dcm.send_all_joining_channels(conn_id, {
         'message': old_name + ' is now known as ' + ebody[
             'nickname'],
         'sender': 'SYSTEM'
