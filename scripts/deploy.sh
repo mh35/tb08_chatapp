@@ -4,9 +4,9 @@ set -eu
 
 date_prfx=`date '+%Y%m%d%H%M%S'`
 
+mkdir api/dst
+mkdir api/dst/code
 cd api
-￼/bin/mkdir dst
-/bin/mkdir dst/code
 cd code
 for dname in *; do
   set +e
