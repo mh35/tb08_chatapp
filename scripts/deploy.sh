@@ -22,9 +22,9 @@ sed -e "s/Key: code\//Key: code\/${date_prfx}_/g" formation.yml >\
 dst/formation_${date_prfx}.yml
 cd dst
 aws s3 sync . s3://${SRC_BUCKET_NAME}
+BUCKET_URL=https://$SRC_BUCKET_NAME.s3-$AWS_DEFAULT_REGION.amazonaws.com
 set +e
 aws cloudformation wait stack-exists --stack-name $STACK_NAME
-BUCKET_URL=https://$SRC_BUCKET_NAME.s3-$AWS_DEFAULT_REGION.amazonaws.com
 if [ $? -eq 0 ]; then
   set -e
   aws cloudformation update-stack --stack-name $STACK_NAME \
