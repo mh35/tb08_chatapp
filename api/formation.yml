@@ -55,7 +55,7 @@ Resources:
             Principal:
               Service:
                 - application-autoscaling.amazonaws.com
-              Action: 'sts:AssumeRole'
+            Action: 'sts:AssumeRole'
       Path: '/'
       Policies:
         -
@@ -178,6 +178,8 @@ Resources:
     Type: AWS::ApiGatewayV2::Api
     Properties:
       Name: Chat WebSocket API
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: $request.body.action
   tableAccessPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -244,8 +246,6 @@ Resources:
                       - '*'
                       - '*'
                       - '*'
-      ProtocolType: WEBSOCKET
-      RouteSelectionExpression: $request.body.action
   onConnect:
     Type: AWS::Serverless::Function
     Properties:
