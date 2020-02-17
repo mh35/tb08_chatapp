@@ -25,7 +25,7 @@ aws s3 sync . s3://${SRC_BUCKET_NAME}
 set +e
 aws cloudformation wait stack-exists --stack-name $STACK_NAME
 BUCKET_URL=https://$SRC_BUCKET_NAME.s3-$AWS_DEFAULT_REGION.amazonaws.com
-if [ $? = 0 ]; then
+if [ $? -eq 0 ]; then
   set -e
   aws cloudformation update-stack --stack-name $STACK_NAME \
   --template-url ${BUCKET_URL}/formation_${date_prfx}.yml \
