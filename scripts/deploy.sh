@@ -23,7 +23,7 @@ dst/formation_${date_prfx}.yml
 cd dst
 aws s3 sync . s3://${SRC_BUCKET_NAME}
 set +e
-aws cloudformation stack-exists --stack-name $STACK_NAME
+aws cloudformation wait stack-exists --stack-name $STACK_NAME
 if [ $? = 0 ]; then
   set -e
   aws cloudformation update-stack --stack-name $STACK_NAME \
