@@ -24,10 +24,11 @@ cd dst
 aws s3 sync . s3://${SRC_BUCKET_NAME}
 set +e
 aws cloudformation wait stack-exists --stack-name $STACK_NAME
+BUCKET_URL=https://$SRC_BUCKET_NAME.s3-$AWS_DEFAULT_REGION.amazonaws.com
 if [ $? = 0 ]; then
   set -e
   aws cloudformation update-stack --stack-name $STACK_NAME \
-  --template-url s3://${SRC_BUCKET_NAME}/formation_${date_prfx}.yml \
+  --template-url ${BUCKET_URL}/formation_${date_prfx}.yml \
   --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
   --parameters ParameterKey=codeBucketName,ParameterValue=$SRC_BUCKET_NAME
   aws cloudformation wait stack-update-complete --stack-name \
@@ -35,7 +36,7 @@ if [ $? = 0 ]; then
 else
   set -e
   aws cloudformation create-stack --stack-name $STACK_NAME \
-  --template-url s3://${SRC_BUCKET_NAME}/formation_${date_prfx}.yml \
+  --template-url ${BUCKET_URL}/formation_${date_prfx}.yml \
   --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
   --parameters ParameterKey=codeBucketName,ParameterValue=$SRC_BUCKET_NAME
   aws cloudformation wait stack-create-complete --stack-name \
